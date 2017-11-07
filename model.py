@@ -261,13 +261,16 @@ class neural_tagger(object):
                     for valid, num in self.get_batch_data(valid_x, valid_y, valid_lens, self.batch_size):
                         trans_matrix, _loss, predication = sess.run(
                             [self.transition, cost, pred], feed_dict=valid)
-                        loss += _loss
+#                       loss += _loss
+                        loss += _loss * num
                         tags_seqs, _ = self.viterbi_decode(
                             num, predication, valid[self.X_len], trans_matrix)
                         f = self.evaluate(
                             num, tags_seqs, valid[self.Y], valid[self.X_len])
-                        acc += f
-                        rd += 1
+                        acc += f * num
+                        rd += num
+#                       acc += f
+#                       rd += 1
                     loss /= rd
                     acc /= rd
                     if acc > max_acc:
@@ -286,13 +289,16 @@ class neural_tagger(object):
             for test, num in self.get_batch_data(test_x, test_y, test_lens, self.batch_size, shuffle=False):
                 trans_matrix, _loss, predication = sess.run(
                     [self.transition, cost, pred], feed_dict=test)
-                loss += _loss
-                rd += 1
+                loss += _loss *num
+                rd += num
+#               loss += _loss
+#               rd += 1
                 tags_seqs, tags_scores = self.viterbi_decode(
                     num, predication, test[self.X_len], trans_matrix)
                 f = self.evaluate(
                     num, tags_seqs, test[self.Y], test[self.X_len])
-                acc += f
+#               acc += f
+                acc += f * num
                 pred_test_y.extend(tags_seqs)
             acc /= rd
             loss /= rd
